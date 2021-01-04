@@ -1,17 +1,23 @@
-import React from 'react';
-import { InputComponent } from './Components/InputComponent'
-import { ItemsList } from './Components/ItemsList'
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+import { todoServerAPI } from './apiUtils'
 
-import { Container } from '@material-ui/core'
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { reducer, initialState } from './store';
-
+import { TodoApp } from './Components/TodoApp'
+import { LinearProgress, AppBar, Toolbar, Typography } from '@material-ui/core'
 
 const App = () => {
+  const state = useSelector(state => state)
+  const dispatch = useDispatch()
+  const [isAppInitialized, setIsAppInitialized] = useState(false)
 
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  useEffect(() => {
+    (async () => {
+      let serverState = await todoServerAPI.getData()
+      dispatch({ type: 'SET_SERVER_STATE', serverState })
+      setIsAppInitialized(true)
+    })()
+  }, [])
+
 
   return (
     <>
@@ -23,10 +29,11 @@ const App = () => {
         </Toolbar>
       </AppBar>
 
-      <Container fixed >
-        <InputComponent dispatch={dispatch} />
-        <ItemsList state={state} dispatch={dispatch} />
-      </Container>
+      {
+        isAppInitialized
+          ? <TodoApp dispatch={dispatch} state={state} />
+          : <LinearProgress />
+      }
     </>
   );
 }

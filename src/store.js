@@ -1,14 +1,11 @@
-export const initialState = [
-  { id: 1609409078, isCompleted: false, title: 'Купить еды', description: 'Много еды' },
-  { id: 1609409079, isCompleted: false, title: 'Позвонить', description: 'Всем позвонить, срочно!!!' },
-  { id: 1609409080, isCompleted: true, title: 'Сделать что-то полезное', description: null },
-  { id: 1609409081, isCompleted: false, title: 'Спасти Мир', description: null },
-  { id: 1609409082, isCompleted: false, title: 'Надеть шапку', description: null },
-];
+import { createStore, applyMiddleware } from 'redux'
 
 
-export const reducer = (state, action) => {
+const reducer = (state, action) => {
   switch (action.type) {
+    case 'SET_SERVER_STATE': {
+      return action.serverState;
+    }
     case 'SET_IS_COMPLETED': {
       return [...state].map(el => el.id !== action.id ? el : { ...el, isCompleted: !el.isCompleted });
     }
@@ -27,3 +24,12 @@ export const reducer = (state, action) => {
       return state;
   }
 };
+
+const thunkMiddleware = store => next => action => {
+  typeof action === 'function'
+    ? action(store.dispatch, store.getState)
+    : next(action)
+}
+
+
+export const store = createStore(reducer, applyMiddleware(thunkMiddleware))

@@ -1,33 +1,30 @@
 import React from 'react'
-
+import { postNewTask } from './../actions' 
 import { Grid, TextField } from '@material-ui/core/';
 
 
-export const InputComponent = (props) => {
-    const [value, setValue] = React.useState('')
+export const InputComponent = ({ dispatch }) => {
+    const [title, setTitle] = React.useState('')
     const [isValidateError, SetIsValidateError] = React.useState(false)
     const [helperText, SetErrorHelperText] = React.useState(null)
 
     const submitTask = () => {
-        if (value === ''){
+        if (title === ''){
             SetIsValidateError(true)
             SetErrorHelperText('Поле не может быть пустым')
-        } else {
+        }else {
             SetIsValidateError(false)
             SetErrorHelperText(null)
-            props.dispatch({ type: 'ADD_TASK', 
-                             title: value,
-                             id: Math.floor(Date.now() / 1000) })
-            setValue('')
+            dispatch(postNewTask(title))
+            setTitle('')
         }
         
     }
-
     return (
         <Grid item xs={12}>
-                <TextField onChange={(e)=>{setValue(e.target.value)}}
+                <TextField onChange={(e)=>{setTitle(e.target.value)}}
                     id="outlined-full-width"
-                    value={value}
+                    value={title}
                     label="Введите новую задачу и нажмите Enter"
                     placeholder="Название задачи"
                     helperText={helperText}
